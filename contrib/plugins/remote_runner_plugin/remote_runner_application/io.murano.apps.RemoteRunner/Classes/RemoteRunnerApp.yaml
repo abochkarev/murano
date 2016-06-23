@@ -1,0 +1,56 @@
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+Namespaces:
+  =: io.murano.apps.remoterunner.plugin
+  std: io.murano
+  rmsys: io.murano.extensions.remoterunner
+
+Name: RemoteRunnerApp
+
+Extends: std:Application
+
+Properties:
+  name:
+    Contract: $.string().notNull()
+
+  host:
+    Contract: $.string().notNull()
+
+  user:
+    Contract: $.string().notNull()
+
+  timeout:
+    Contract: $.int().notNull()
+
+  script:
+    Contract: $.string()
+
+  sudo:
+    Contract: $.bool()
+
+Methods:
+  .init:
+    Body:
+      - $._environment: $.find(std:Environment).require()
+      - Try:
+        - $._remoterunner: new(rmsys:RemoteRunner, host => $.host, user => $.user, timeout => $.timeout, sudo => $.sudo)
+        Catch:
+          With: 'murano.dsl.exceptions.NoPackageForClassFound'
+          Do:
+            Throw: PluginNotFoundException
+            Message: 'Remote runner plugin is not installed'
+
+  deploy:
+    Body:
+      - $._remoterunner.run($.script)
+      - $._environment.reporter.report($this, 'Script is executed.')

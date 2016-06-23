@@ -1,0 +1,59 @@
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+Version: 2
+
+Application:
+  ?:
+    type: io.murano.apps.remoterunner.plugin.RemoteRunnerApp
+  name: $.appConfiguration.name
+  host: $.appConfiguration.host
+  user: $.appConfiguration.user
+  timeout: $.appConfiguration.timeout
+  script: $.appConfiguration.script
+  sudo: $.appConfiguration.sudo
+
+Forms:
+  - appConfiguration:
+      fields:
+        - name: name
+          type: string
+          hidden: true
+          initial: 'RemoteRunner'
+        - name: host
+          type: string
+          label: Remote Host
+          description: >-
+            Remote host to execute a shell script.
+        - name: user
+          type: string
+          label: User
+          description: >-
+            Ssh user to connect to remote host.
+        - name: timeout
+          type: integer
+          label: Timeout
+          initial: 1800
+          description: >-
+            Command timeout.
+        - name: script
+          type: text
+          label: Script
+          initial: 'apt-get update'
+          description: >-
+            Shell script.
+        - name: sudo
+          type: boolean
+          label: Sudo
+          initial: true
+          description: >-
+            Execute a command as root.
